@@ -1,0 +1,84 @@
+/* Basic styles for the game */
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: black;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+/* Game area stays fullscreen */
+#gameArea {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    background-color: black;
+}
+
+/* Player remains centered */
+#player {
+    position: fixed;
+    left: calc(50% - 128px); /* 256px / 2 */
+    top: calc(50% - 128px);
+    width: 340px;
+    height: 340px;
+    background-image: url('dark_souls.gif');
+    background-size: cover;
+    transform: scaleX(-1);
+    z-index: 2;
+}
+
+/* Moving background layer */
+#background {
+    position: absolute;
+    width: 70vw;
+    height: 70vh;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%); /* centers it perfectly */
+    opacity: 70%;
+    background-image: url('bg-1.gif'); /* Your gif background */
+    background-repeat: repeat-x;
+    background-position: 0 0;
+    background-size: cover;
+
+    z-index: 0;
+}
+
+/* Message/letter styles */
+.message {
+    top: 75px; 
+    right: 225px;
+    position: absolute; /* Prevent flexing */
+    white-space: nowrap; /* Prevent text from wrapping */
+    transition: opacity 0.3s ease; /* Smooth opacity transition */
+    color: #dedede;
+    font-size: 28px;
+    font-family: 'Georgia', serif;
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 100;
+}
+
+.log {
+    position: absolute;
+    width: 160px;
+    height: 100px;
+    z-index: 5;
+}
+
+.bonfire {
+    position: absolute;
+    width: 200px;
+    height: 190px;
+    z-index: 5;
+}
+
+.bonfire-2 {
+    position: absolute;
+    width: 350px;
+    height: 220px;
+    transform: rotate(3deg);
+    z-index: 5;
+}

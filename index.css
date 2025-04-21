@@ -75,25 +75,6 @@ body {
     z-index: 5;
 }
 
-.bonfire-2 {
-    position: absolute;
-    width: 350px;
-    height: 220px;
-    transform: rotate(3deg);
-    z-index: 5;
-}
-
-.music {
-    position: absolute;
-    top: 40px;
-    left: 40px;
-    opacity: 70%;
-    cursor: pointer;
-    width: 30px;
-    height: auto;
-    z-index: 9999;
-}
-
 .firekeeper {
     position: absolute;
     bottom: 20px; /* Keep her at the bottom */
@@ -152,3 +133,46 @@ body {
       transform: translateX(-50%) translateY(0);
     }
   }
+
+  #black-screen {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    transition: opacity 3s ease-in-out; /* This doesn't do anything */
+    z-index: 999;
+  }
+
+  .music {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    opacity: 70%;
+    cursor: pointer;
+    width: 30px;
+    height: auto;
+    z-index: 9999;
+}
+  
+  #birthday-text {
+    color: white;
+    font-size: 30px;
+    font-family: 'Cinzel', serif;
+    text-align: center;
+    margin-bottom: 40px;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  
+  #birthday-video {
+    width: 100%;
+    max-width: 300px;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  

@@ -13,7 +13,6 @@
             const audio = document.getElementById('bg-audio');
             audio.volume = 0.2;
             const button = document.getElementById('music-button');
-        
             if (audio.paused) {
             audio.play();
             button.src = 'pause.png';
@@ -50,9 +49,15 @@
         <div class="message" style="left: 3950px; top: 290px;">Light the Bonfire.</div>
         <img class="interactable bonfire" src="bonfire.gif" style="left: 4900px; top: 488px;" />
         <div class="message" style="left: 5020px; top: 550px;" fontSize="14">E to interact</div> <!-- + 250 from bonfire -->
-        <div class="message" style="left: 6000px; top: 290px;">?????</div>
         <img class="interactable chest" src="chest.png" style="left: 6300px; top: 540px;"/>
         <div class="message" style="left: 6350px; top: 480px;" fontSize="14">E to interact</div> <!-- - 250 from chest -->
+        <div id="black-screen">
+            <div id="birthday-text">Happy Birthday Kellen! You are so loved &lt;3</div>
+            <video id="birthday-video" controls autoplay playsinline>
+                <source src="birthday_video.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+            </video>
+        </div>
     </div>
     <script src="index.js"></script>
 </body>

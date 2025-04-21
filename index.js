@@ -1,13 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
     const MAX_BACKGROUND_X = 0;
     const MIN_BACKGROUND_X = -5382;
-    
+
     const player = document.getElementById('player');
     const background = document.getElementById('background');
     const messages = document.querySelectorAll('.message');
     const interactables = document.querySelectorAll('.interactable');
     const dialogueBox = document.getElementById('dialogue-box');
     const bonfire = document.getElementById('bonfire-2');
+    const blackScreen = document.getElementById('black-screen');
+    const birthdayText = document.getElementById('birthday-text');
+    const birthdayVideo = document.getElementById('birthday-video');
 
     const spriteWidth = 340;
     const spriteHeight = 340;
@@ -32,17 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const backgroundMovementScale = 0.4;
     const messageMovementScale = 1;
 
-    const firekeeperTarget = {
-        x: -1821.9999542236328,
-        y: 332.5187759399414
-    };
+    const firekeeperTarget = { x: -1821.9999542236328, y: 332.5187759399414 };
+    const bonfireTarget = { x: -3993.999954223633, y: 332.5187759399414 };
+    const chestTarget = { x: -5400, y: 332 };
 
-    const bonfireTarget = {
-        x: -3993.999954223633,
-        y: 332.5187759399414
-    };
-
-    const interactionRangeX = 300;
+    const interactionRangeX = 250;
 
     const firekeeperDialogue = [
         "Come closer, Ashen one... Let me guide your soul, if only for a moment.",
@@ -52,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const bonfireDialogue = [
         "The flames... they whisper of rest.",
         "Time marches onward, yet the embers remain...",
-        "<i>You received Birthday Ember.<i>",
+        "<i>You received Birthday Ember.</i>",
     ];
 
     let currentDialogueIndex = 0;
@@ -70,9 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
             isJumping = true;
             velocityY = jumpHeight;
         } else if (e.key === 'e') {
-            if (isPlayerInRange && currentInteraction) {
-                const dialogue = currentInteraction === 'firekeeper' ? firekeeperDialogue : bonfireDialogue;
-
+            if (isPlayerInRange && currentInteraction === 'firekeeper') {
+                const dialogue = firekeeperDialogue;
                 if (currentDialogueIndex < dialogue.length) {
                     dialogueBox.style.display = 'block';
                     dialogueBox.innerHTML = dialogue[currentDialogueIndex];
@@ -81,6 +77,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     dialogueBox.style.display = 'none';
                     currentDialogueIndex = 0;
                 }
+            } else if (isPlayerInRange && currentInteraction === 'bonfire') {
+                const dialogue = bonfireDialogue;
+                if (currentDialogueIndex < dialogue.length) {
+                    dialogueBox.style.display = 'block';
+                    dialogueBox.innerHTML = dialogue[currentDialogueIndex];
+                    currentDialogueIndex++;
+                } else {
+                    dialogueBox.style.display = 'none';
+                    currentDialogueIndex = 0;
+                }
+            } else if (isPlayerInRange && currentInteraction === 'chest') {
+                blackScreen.style.display = 'flex';
+                setTimeout(() => {
+                    birthdayText.style.opacity = '1';
+                    birthdayVideo.style.opacity = '1';
+                }, 500); // fade in after black screen
             }
         }
     });
@@ -106,41 +118,39 @@ document.addEventListener('DOMContentLoaded', () => {
         player.style.top = position.y + 'px';
 
         const nextBackgroundX = backgroundX + moveDirection * backgroundMovementScale;
-
-        //Track player's movements
-        console.log('Player background X:', position.x + backgroundX);
+        const playerBgX = position.x + backgroundX;
 
         if (nextBackgroundX > MAX_BACKGROUND_X || (position.x + nextBackgroundX) < MIN_BACKGROUND_X) return;
 
         backgroundX = nextBackgroundX;
         background.style.backgroundPosition = `${backgroundX}px 0`;
 
-        const playerInBgX = position.x + backgroundX;
-
-        const distanceToFirekeeper = Math.abs(playerInBgX - firekeeperTarget.x);
-        const distanceToBonfire = Math.abs(playerInBgX - bonfireTarget.x);
+        const distanceToFirekeeper = Math.abs(playerBgX - firekeeperTarget.x);
+        const distanceToBonfire = Math.abs(playerBgX - bonfireTarget.x);
+        const distanceToChest = Math.abs(playerBgX - chestTarget.x);
 
         if (distanceToFirekeeper <= interactionRangeX) {
             isPlayerInRange = true;
             currentInteraction = 'firekeeper';
-            messages.forEach((msg) => msg.style.color = '#b4b4b4');
         } else if (distanceToBonfire <= interactionRangeX) {
             isPlayerInRange = true;
             currentInteraction = 'bonfire';
-            messages.forEach((msg) => msg.style.color = '#b4b4b4');
             if (bonfire) bonfire.src = 'bonfire.png';
+        } else if (distanceToChest <= interactionRangeX) {
+            isPlayerInRange = true;
+            currentInteraction = 'chest';
         } else {
             isPlayerInRange = false;
             currentInteraction = null;
-            messages.forEach((msg) => msg.style.color = '#dedede');
-            if (bonfire) bonfire.src = 'unlit-bonfire.png';
             dialogueBox.style.display = 'none';
             currentDialogueIndex = 0;
+            if (bonfire) bonfire.src = 'unlit-bonfire.png';
         }
 
-        // Messages
-        messages.forEach((message) => {
-            let signPositionX = parseInt(message.style.left, 10) || 0;
+        messages.forEach((msg) => {
+            msg.style.color = (isPlayerInRange && currentInteraction) ? '#b4b4b4' : '#dedede';
+
+            let signPositionX = parseInt(msg.style.left, 10) || 0;
             signPositionX += moveDirection * backgroundMovementScale * messageMovementScale;
 
             const leftEdge = bgRect.left;
@@ -148,18 +158,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (signPositionX < leftEdge) {
                 const opacity = Math.max(0, 1 - ((leftEdge - signPositionX) / 100));
-                message.style.opacity = opacity;
+                msg.style.opacity = opacity;
             } else if (signPositionX > rightEdge) {
                 const opacity = Math.max(0, 1 - ((signPositionX - rightEdge) / 100));
-                message.style.opacity = opacity;
+                msg.style.opacity = opacity;
             } else {
-                message.style.opacity = 1;
+                msg.style.opacity = 1;
             }
 
-            message.style.left = `${signPositionX}px`;
+            msg.style.left = `${signPositionX}px`;
         });
 
-        // Interactables
         interactables.forEach((item) => {
             let itemX = parseInt(item.style.left, 10) || 0;
             itemX += moveDirection * backgroundMovementScale;
@@ -167,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const leftEdge = bgRect.left;
             const rightEdge = bgRect.left + bgRect.width;
-
             item.style.opacity = (itemX > leftEdge && itemX < rightEdge) ? 1 : 0;
         });
     }

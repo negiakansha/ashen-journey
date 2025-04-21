@@ -1,11 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     const MAX_BACKGROUND_X = 0;
+    const MIN_BACKGROUND_X = -5382;
+    
     const player = document.getElementById('player');
     const background = document.getElementById('background');
     const messages = document.querySelectorAll('.message');
     const interactables = document.querySelectorAll('.interactable');
     const dialogueBox = document.getElementById('dialogue-box');
-    const bonfire = document.getElementById('bonfire-2'); // <- Add this for bonfire
+    const bonfire = document.getElementById('bonfire-2');
 
     const spriteWidth = 340;
     const spriteHeight = 340;
@@ -40,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         y: 332.5187759399414
     };
 
-    const interactionRangeX = 200;
+    const interactionRangeX = 300;
 
     const firekeeperDialogue = [
         "Come closer, Ashen one... Let me guide your soul, if only for a moment.",
@@ -105,7 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const nextBackgroundX = backgroundX + moveDirection * backgroundMovementScale;
 
-        if (nextBackgroundX > MAX_BACKGROUND_X) return;
+        //Track player's movements
+        console.log('Player background X:', position.x + backgroundX);
+
+        if (nextBackgroundX > MAX_BACKGROUND_X || (position.x + nextBackgroundX) < MIN_BACKGROUND_X) return;
 
         backgroundX = nextBackgroundX;
         background.style.backgroundPosition = `${backgroundX}px 0`;

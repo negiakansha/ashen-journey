@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const messages = document.querySelectorAll('.message');
     const interactables = document.querySelectorAll('.interactable');
     const dialogueBox = document.getElementById('dialogue-box');
+    const bonfire = document.getElementById('bonfire-2'); // <- Add this for bonfire
 
     const spriteWidth = 340;
     const spriteHeight = 340;
@@ -23,28 +24,37 @@ document.addEventListener('DOMContentLoaded', () => {
     let isJumping = false;
     let velocityY = 0;
     const gravity = 0.5;
-    const jumpHeight = -15;
+    const jumpHeight = -13;
     let moveDirection = 0;
 
     const backgroundMovementScale = 0.4;
     const messageMovementScale = 1;
 
-    const targetPosition = {
+    const firekeeperTarget = {
         x: -1821.9999542236328,
         y: 332.5187759399414
     };
 
-    const interactionRangeX = 400;
-    const proximityThreshold = 20;
+    const bonfireTarget = {
+        x: -3993.999954223633,
+        y: 332.5187759399414
+    };
 
-    const dialogueOptions = [
-        "Welcome, Ashen One...",
-        "Let my flames guide you.",
-        "You are held in her embrace.",
-        "You received the Kiss of Flame."
+    const interactionRangeX = 200;
+
+    const firekeeperDialogue = [
+        "Come closer, Ashen one... Let me guide your soul, if only for a moment.",
+        "<i>You received Kiss of Flame.</i>"
     ];
+
+    const bonfireDialogue = [
+        "The flame is kindled.",
+        "<i>You feel warmth and rest...</i>"
+    ];
+
     let currentDialogueIndex = 0;
     let isPlayerInRange = false;
+    let currentInteraction = null;
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowRight' || e.key === 'd') {
@@ -57,10 +67,12 @@ document.addEventListener('DOMContentLoaded', () => {
             isJumping = true;
             velocityY = jumpHeight;
         } else if (e.key === 'e') {
-            if (isPlayerInRange) {
-                if (currentDialogueIndex < dialogueOptions.length) {
+            if (isPlayerInRange && currentInteraction) {
+                const dialogue = currentInteraction === 'firekeeper' ? firekeeperDialogue : bonfireDialogue;
+
+                if (currentDialogueIndex < dialogue.length) {
                     dialogueBox.style.display = 'block';
-                    dialogueBox.innerHTML = dialogueOptions[currentDialogueIndex];
+                    dialogueBox.innerHTML = dialogue[currentDialogueIndex];
                     currentDialogueIndex++;
                 } else {
                     dialogueBox.style.display = 'none';
@@ -92,22 +104,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const nextBackgroundX = backgroundX + moveDirection * backgroundMovementScale;
 
-        if (nextBackgroundX > MAX_BACKGROUND_X) {
-            return;
-        }
+        if (nextBackgroundX > MAX_BACKGROUND_X) return;
 
         backgroundX = nextBackgroundX;
         background.style.backgroundPosition = `${backgroundX}px 0`;
 
         const playerInBgX = position.x + backgroundX;
-        const distanceToTargetX = Math.abs(playerInBgX - targetPosition.x);
-        const distanceToTargetY = Math.abs(position.y - targetPosition.y);
 
-        // Update if player is in range
-        if (distanceToTargetX <= interactionRangeX && distanceToTargetY <= proximityThreshold) {
+        const distanceToFirekeeper = Math.abs(playerInBgX - firekeeperTarget.x);
+        const distanceToBonfire = Math.abs(playerInBgX - bonfireTarget.x);
+
+        if (distanceToFirekeeper <= interactionRangeX) {
             isPlayerInRange = true;
+            currentInteraction = 'firekeeper';
+            messages.forEach((msg) => msg.style.color = '#b4b4b4');
+        } else if (distanceToBonfire <= interactionRangeX) {
+            isPlayerInRange = true;
+            currentInteraction = 'bonfire';
+            messages.forEach((msg) => msg.style.color = '#b4b4b4');
+            if (bonfire) bonfire.src = 'bonfire.png';
         } else {
             isPlayerInRange = false;
+            currentInteraction = null;
+            messages.forEach((msg) => msg.style.color = '#dedede');
+            if (bonfire) bonfire.src = 'unlit-bonfire.png';
             dialogueBox.style.display = 'none';
             currentDialogueIndex = 0;
         }
@@ -115,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Messages
         messages.forEach((message) => {
             let signPositionX = parseInt(message.style.left, 10) || 0;
-            signPositionX += (moveDirection * backgroundMovementScale * messageMovementScale);
+            signPositionX += moveDirection * backgroundMovementScale * messageMovementScale;
 
             const leftEdge = bgRect.left;
             const rightEdge = bgRect.left + bgRect.width;
@@ -142,11 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const leftEdge = bgRect.left;
             const rightEdge = bgRect.left + bgRect.width;
 
-            if (itemX > leftEdge && itemX < rightEdge) {
-                item.style.opacity = 1;
-            } else {
-                item.style.opacity = 0;
-            }
+            item.style.opacity = (itemX > leftEdge && itemX < rightEdge) ? 1 : 0;
         });
     }
 

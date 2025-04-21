@@ -48,8 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     const bonfireDialogue = [
-        "The flame is kindled.",
-        "<i>You feel warmth and rest...</i>"
+        "The flames... they whisper of rest.",
+        "Time marches onward, yet the embers remain...",
+        "<i>You received Birthday Ember.<i>",
     ];
 
     let currentDialogueIndex = 0;

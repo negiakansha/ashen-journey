@@ -7,13 +7,53 @@
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
+    <script>
+        //bg music
+        function toggleMusic() {
+            const audio = document.getElementById('bg-audio');
+            audio.volume = 0.2;
+            const button = document.getElementById('music-button');
+        
+            if (audio.paused) {
+            audio.play();
+            button.src = 'pause.png';
+            button.alt = 'Pause';
+            } else {
+            audio.pause();
+            button.src = 'play.png';
+            button.alt = 'Play';
+            }
+        }
+    </script>
+    <img
+        onclick="toggleMusic()"
+        src="play.png"
+        alt="Play"
+        class="music"
+        id="music-button"
+    />
+    <audio id="bg-audio" loop>
+        <source src="dark_souls_3.mp3" type="audio/mpeg">
+    </audio>
     <div id="gameArea">
         <div id="background"></div>
         <div id="player"></div>
+        <img class="interactable chest" src="chest.png" style="left: -2900px; top: 540px;" />
+        <div class="message" style="left: -2850px; top: 480px;" fontSize="14">E to interact</div> <!-- - 250 from chest -->
+        <div class="message" style="left: -1250px; top: 290px;">Turn back now.</div>
         <div class="message" style="left: 780px; top: 290px;">W A S D to move.</div>
-        <div class="message" style="left: 2700px; top: 290px;">Find the Fire Keeper.</div>
+        <div class="message" style="left: 1800px; top: 290px;">Talk to the Fire Keeper.</div>
+        <img class="firekeeper" src="firekeeper.png" style="top: 335px;"/>
+        <img class="interactable firekeeper" src="firekeeper.png" style="left: 2800px; top: 335px;" />
+        <div class="message" style="left: 3050px; top: 450px;" fontSize="14">E to interact</div> <!-- + 250 from firekeeper -->
+        <div id="dialogue-box" class="hidden">
+            <p class="dialogue-line">Let my flames guide you...</p>
+            <p class="dialogue-line">You are held... in her embrace.</p>
+            <p class="dialogue-line">You receive the Kiss of Fire.</p>
+        </div>
+        <!-- <div class="message" style="left: 1800px; top: 290px;">Light the Bonfire.</div> -->
         <!-- <img src="unlit-bonfire.png" class="bonfire-2" style="left: 620px; top: 480px;" /> -->
-        <img src="bonfire.gif" class="bonfire" style="left: 680px; top: 488px;" />
+        <!-- <img src="bonfire.gif" class="bonfire" style="left: 680px; top: 488px;" /> -->
     </div>
     <script src="index.js"></script>
 </body>

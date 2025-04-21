@@ -1,15 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const MAX_BACKGROUND_X = 0;
     const player = document.getElementById('player');
     const background = document.getElementById('background');
     const messages = document.querySelectorAll('.message');
+    const interactables = document.querySelectorAll('.interactable');
+    const dialogueBox = document.getElementById('dialogue-box');
 
     const spriteWidth = 340;
     const spriteHeight = 340;
 
-    // Get background's position and size
     const bgRect = background.getBoundingClientRect();
 
-    // Set player starting position at bottom center of background
     const position = {
         x: bgRect.left + bgRect.width / 2 - spriteWidth / 2 - 120,
         y: bgRect.top + bgRect.height - spriteHeight
@@ -19,86 +20,135 @@ document.addEventListener('DOMContentLoaded', () => {
     player.style.top = position.y + 'px';
 
     let backgroundX = 0;
-    let isJumping = false; // Track if player is jumping
-    let velocityY = 0; // Vertical speed (used for gravity effect)
-    const gravity = 0.5; // Gravity force
-    const jumpHeight = -15; // How high the player jumps
-    let moveDirection = 0; // Used to track movement direction (left or right)
+    let isJumping = false;
+    let velocityY = 0;
+    const gravity = 0.5;
+    const jumpHeight = -15;
+    let moveDirection = 0;
 
-    // Set the scaling factor for message movement (how much slower the messages move)
-    const backgroundMovementScale = 0.4; // Background moves at 1/4 of the player's speed
-    const messageMovementScale = 1; // Messages move at the same speed as background in both directions
+    const backgroundMovementScale = 0.4;
+    const messageMovementScale = 1;
+
+    const targetPosition = {
+        x: -1821.9999542236328,
+        y: 332.5187759399414
+    };
+
+    const interactionRangeX = 400;
+    const proximityThreshold = 20;
+
+    const dialogueOptions = [
+        "Welcome, Ashen One...",
+        "Let my flames guide you.",
+        "You are held in her embrace.",
+        "You received the Kiss of Flame."
+    ];
+    let currentDialogueIndex = 0;
+    let isPlayerInRange = false;
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowRight' || e.key === 'd') {
-            moveDirection = -10; // move background left
+            moveDirection = -10;
             player.style.transform = 'scaleX(-1)';
         } else if (e.key === 'ArrowLeft' || e.key === 'a') {
-            moveDirection = 10; // move background right
+            moveDirection = 10;
             player.style.transform = 'scaleX(1)';
         } else if ((e.key === 'ArrowUp' || e.key === ' ' || e.key === 'w') && !isJumping) {
-            // Space, up arrow, or 'W' for jumping
             isJumping = true;
             velocityY = jumpHeight;
+        } else if (e.key === 'e') {
+            if (isPlayerInRange) {
+                if (currentDialogueIndex < dialogueOptions.length) {
+                    dialogueBox.style.display = 'block';
+                    dialogueBox.innerHTML = dialogueOptions[currentDialogueIndex];
+                    currentDialogueIndex++;
+                } else {
+                    dialogueBox.style.display = 'none';
+                    currentDialogueIndex = 0;
+                }
+            }
         }
     });
 
     document.addEventListener('keyup', (e) => {
-        // Stop movement when key is released
         if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'ArrowLeft' || e.key === 'a') {
-            moveDirection = 0; // Stop background movement
+            moveDirection = 0;
         }
     });
 
     function updatePlayerPosition() {
-        // Update the player's vertical position (simulate gravity)
         if (isJumping) {
-            position.y += velocityY; // Move up or down based on velocity
-            velocityY += gravity; // Apply gravity by increasing velocityY
+            position.y += velocityY;
+            velocityY += gravity;
 
-            // If the player reaches the ground, stop jumping
             if (position.y >= bgRect.top + bgRect.height - spriteHeight) {
-                position.y = bgRect.top + bgRect.height - spriteHeight; // Ensure player stays on the ground
-                isJumping = false; // Stop jumping
+                position.y = bgRect.top + bgRect.height - spriteHeight;
+                isJumping = false;
             }
         }
 
-        // Update player position on the screen
         player.style.left = position.x + 'px';
         player.style.top = position.y + 'px';
 
-        // Move the background at a slower speed compared to the player
-        backgroundX += moveDirection * backgroundMovementScale;
+        const nextBackgroundX = backgroundX + moveDirection * backgroundMovementScale;
 
-        // Apply background movement
+        if (nextBackgroundX > MAX_BACKGROUND_X) {
+            return;
+        }
+
+        backgroundX = nextBackgroundX;
         background.style.backgroundPosition = `${backgroundX}px 0`;
 
-        // Move the messages more slowly than the background, but adjust for the opposite direction
-        messages.forEach((message) => {
-            let signPositionX = parseInt(message.style.left, 10) || 0; // Get initial position of the message
-            signPositionX += (moveDirection * backgroundMovementScale * messageMovementScale); // Adjust position
+        const playerInBgX = position.x + backgroundX;
+        const distanceToTargetX = Math.abs(playerInBgX - targetPosition.x);
+        const distanceToTargetY = Math.abs(position.y - targetPosition.y);
 
-            // Check if the message is going out of bounds (left or right)
+        // Update if player is in range
+        if (distanceToTargetX <= interactionRangeX && distanceToTargetY <= proximityThreshold) {
+            isPlayerInRange = true;
+        } else {
+            isPlayerInRange = false;
+            dialogueBox.style.display = 'none';
+            currentDialogueIndex = 0;
+        }
+
+        // Messages
+        messages.forEach((message) => {
+            let signPositionX = parseInt(message.style.left, 10) || 0;
+            signPositionX += (moveDirection * backgroundMovementScale * messageMovementScale);
+
             const leftEdge = bgRect.left;
             const rightEdge = bgRect.left + bgRect.width;
 
             if (signPositionX < leftEdge) {
-                // Fade out the message as it moves past the left edge
                 const opacity = Math.max(0, 1 - ((leftEdge - signPositionX) / 100));
-                message.style.opacity = opacity; // Decrease opacity as it goes out of view
+                message.style.opacity = opacity;
             } else if (signPositionX > rightEdge) {
-                // Fade out the message as it moves past the right edge
                 const opacity = Math.max(0, 1 - ((signPositionX - rightEdge) / 100));
-                message.style.opacity = opacity; // Decrease opacity as it goes out of view
+                message.style.opacity = opacity;
             } else {
-                message.style.opacity = 1; // Full opacity when the message is within the bounds
+                message.style.opacity = 1;
             }
 
-            // Update the message position
             message.style.left = `${signPositionX}px`;
+        });
+
+        // Interactables
+        interactables.forEach((item) => {
+            let itemX = parseInt(item.style.left, 10) || 0;
+            itemX += moveDirection * backgroundMovementScale;
+            item.style.left = `${itemX}px`;
+
+            const leftEdge = bgRect.left;
+            const rightEdge = bgRect.left + bgRect.width;
+
+            if (itemX > leftEdge && itemX < rightEdge) {
+                item.style.opacity = 1;
+            } else {
+                item.style.opacity = 0;
+            }
         });
     }
 
-    // Call updatePlayerPosition repeatedly to apply gravity and jumping effect
-    setInterval(updatePlayerPosition, 1000 / 60); // 60 FPS for smooth movement
+    setInterval(updatePlayerPosition, 1000 / 60);
 });

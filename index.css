@@ -82,3 +82,63 @@ body {
     transform: rotate(3deg);
     z-index: 5;
 }
+
+.music {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    opacity: 70%;
+    cursor: pointer;
+    width: 30px;
+    height: auto;
+    z-index: 9999;
+}
+
+.firekeeper {
+    position: absolute;
+    bottom: 20px; /* Keep her at the bottom */
+    left: 780px; /* Initial position */
+    height: 360px;
+    width: 360px;
+    z-index: 100;
+    transition: opacity 1s ease; /* Smooth fade */
+    opacity: 0; /* Start hidden */
+}
+
+.chest {
+    position: fixed;
+    transform: scaleX(-1);
+    bottom: 20px; /* Keep it at the bottom */
+    left: 780px; /* Initial position */
+    height: 170px;
+    width: 280px;
+    z-index: 100;
+    transition: opacity 1s ease; /* Smooth fade */
+    opacity: 0; /* Start hidden */
+}
+
+#dialogue-box {
+    position: absolute;
+    bottom: 180px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: black;
+    color: #dcdcdc;
+    font-family: 'Georgia', serif;
+    font-size: 18px;
+    padding: 20px 30px;
+    border: 2px solid #ff7ab8;
+    max-width: 400px;
+    text-align: center;
+    opacity: 0.95;
+    z-index: 999;
+    display: none;
+}
+
+#dialogue-box.show {
+    display: block;
+}
+
+.dialogue-line {
+    margin: 10px 0;
+}
